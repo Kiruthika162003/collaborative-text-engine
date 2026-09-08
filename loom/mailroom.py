@@ -61,8 +61,7 @@ class Mailroom:
         return None
 
     def _weave_ready(self, op: Op) -> str:
-        receipt = self.author.weave.apply(op)
-        self.author.clock.observe(op.id)
+        receipt = self.author.absorb(op)
         self.woven += 1
         return receipt
 

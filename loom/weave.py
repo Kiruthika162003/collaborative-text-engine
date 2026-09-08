@@ -1,22 +1,24 @@
 """The weave: a sequence CRDT where every replica arrives at the same cloth.
 
 Each glyph is a strand: an id, the id of the strand it was
-typed after, and the character itself. Insertion is the
-whole algorithm. A strand enters after its origin, then
-walks right past anything attached deeper than that origin,
-and among true siblings, strands typed after the same
-origin, the higher id stands closer, a rule with two
-virtues: it is the same rule on every replica, and it keeps
-one author's run contiguous, because each glyph in a run
-originates on the previous one and travels as a block, so
-two people typing at the same spot produce one run then the
-other, never a shuffle of letters from both. Deletion never
-removes a strand, it shears it, and the tombstone stays to
-anchor arrivals that still reference it, the price of
-convergence paid in memory and collected later by the
-gravedigger, not here. Apply is idempotent, the same
-operation twice weaving once, since a network that never
-duplicates is a network in a diagram.
+typed after, the character, and a rank. Insertion is the
+whole algorithm. A strand enters after its origin, walks
+right past anything attached deeper, and among true
+siblings the higher rank stands closer, sites breaking
+rank ties. The rank is a Lamport stamp and it exists
+because of a measured failure, not a foresight: the first
+design ordered siblings by the per-site counter, and the
+duet trial promptly produced the foxbrown, Bob's insertion
+losing to a resident run because his counter said one
+while his eyes had seen thirteen. Delivery counters count
+a site's own operations and must stay contiguous for the
+clock; ordering needs a number that grows with everything
+a site has witnessed, and those are two jobs no single
+integer does honestly. Deletion shears rather than
+removes, the tombstone staying to anchor late arrivals,
+and apply is idempotent, the same operation twice weaving
+once, since a network that never duplicates is a network
+in a diagram.
 """
 
 from __future__ import annotations
@@ -34,6 +36,7 @@ class Insert:
     id: OpId
     origin: OpId | None
     glyph: str
+    rank: int
 
     def __post_init__(self) -> None:
         if len(self.glyph) != 1:
@@ -43,6 +46,15 @@ class Insert:
                 "strand by strand so runs can merge "
                 "strand by strand"
             )
+        if self.rank < 1:
+            raise Invalid(
+                f"rank {self.rank} on {self.id.wire()}; "
+                "ranks start at one and grow with "
+                "everything a site has witnessed"
+            )
+
+    def seat_key(self) -> tuple[int, str]:
+        return (self.rank, self.id.site)
 
 
 @dataclass(frozen=True)
@@ -59,7 +71,11 @@ class Strand:
     id: OpId
     origin: OpId | None
     glyph: str
+    rank: int
     sheared: bool = False
+
+    def seat_key(self) -> tuple[int, str]:
+        return (self.rank, self.id.site)
 
 
 @dataclass
@@ -96,7 +112,7 @@ class Weave:
                 break
             if (
                 standing_origin == origin_pos
-                and standing.id < op.id
+                and standing.seat_key() < op.seat_key()
             ):
                 break
             pos += 1
@@ -106,6 +122,7 @@ class Weave:
                 id=op.id,
                 origin=op.origin,
                 glyph=op.glyph,
+                rank=op.rank,
             ),
         )
         self._reindex(pos)

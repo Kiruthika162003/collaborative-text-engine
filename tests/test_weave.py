@@ -19,7 +19,12 @@ def typed_run(
     for offset, glyph in enumerate(text):
         this_id = op_id(site, start + offset)
         ops.append(
-            Insert(id=this_id, origin=anchor, glyph=glyph)
+            Insert(
+                id=this_id,
+                origin=anchor,
+                glyph=glyph,
+                rank=start + offset,
+            )
         )
         anchor = this_id
     return ops
@@ -49,6 +54,7 @@ class TestWeaving:
                     id=op_id("bob", 2),
                     origin=op_id("bob", 1),
                     glyph="x",
+                    rank=2,
                 )
             )
         assert "Buffer it" in str(caught.value)
@@ -59,6 +65,16 @@ class TestWeaving:
                 id=op_id("alice", 1),
                 origin=HEAD,
                 glyph="ab",
+                rank=1,
+            )
+
+    def test_ranks_start_at_one(self):
+        with pytest.raises(Invalid):
+            Insert(
+                id=op_id("alice", 1),
+                origin=HEAD,
+                glyph="a",
+                rank=0,
             )
 
 
@@ -75,19 +91,27 @@ class TestConcurrency:
         assert one.text() == two.text()
         assert one.text() in ("abcxyz", "xyzabc")
 
-    def test_the_higher_id_stands_closer(self):
+    def test_rank_ties_break_by_site(self):
         first = Insert(
-            id=op_id("alice", 1), origin=HEAD, glyph="a"
+            id=op_id("alice", 1),
+            origin=HEAD,
+            glyph="a",
+            rank=1,
         )
         second = Insert(
-            id=op_id("bob", 1), origin=HEAD, glyph="b"
+            id=op_id("bob", 1),
+            origin=HEAD,
+            glyph="b",
+            rank=1,
         )
         weave = Weave()
         weave.apply(first)
         weave.apply(second)
         assert weave.text() == "ba"
 
-    def test_siblings_rank_below_the_resident_run(self):
+    def test_unwitnessed_siblings_rank_below_residents(
+        self,
+    ):
         weave = Weave()
         alice_ops = typed_run("alice", 1, "ad")
         for op in alice_ops:
@@ -97,6 +121,7 @@ class TestConcurrency:
                 id=op_id("bob", 1),
                 origin=alice_ops[0].id,
                 glyph="c",
+                rank=1,
             )
         )
         weave.apply(
@@ -104,9 +129,27 @@ class TestConcurrency:
                 id=op_id("cara", 1),
                 origin=alice_ops[0].id,
                 glyph="b",
+                rank=1,
             )
         )
         assert weave.text() == "adbc"
+
+    def test_a_witnessed_insert_seats_where_intended(
+        self,
+    ):
+        weave = Weave()
+        alice_ops = typed_run("alice", 1, "ad")
+        for op in alice_ops:
+            weave.apply(op)
+        weave.apply(
+            Insert(
+                id=op_id("bob", 1),
+                origin=alice_ops[0].id,
+                glyph="b",
+                rank=3,
+            )
+        )
+        assert weave.text() == "abd"
 
 
 class TestShears:
@@ -149,9 +192,10 @@ class TestShears:
                 id=op_id("cara", 1),
                 origin=ops[0].id,
                 glyph="x",
+                rank=9,
             )
         )
-        assert weave.text() == "bx"
+        assert weave.text() == "xb"
 
 
 class TestVisibleAddressing:

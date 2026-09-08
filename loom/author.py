@@ -13,9 +13,14 @@ about it whenever the network is ready. Erasure resolves
 visible positions to strand ids before minting shears,
 positions being a conversation between a human and their
 screen while ids are the only language replicas share.
-The author observes its own operations on its own clock,
-one hand honest with itself being the precondition for
-honesty between hands.
+The author keeps two numbers that must never be confused:
+the per-site counter, counting its own operations for
+delivery, contiguous by law, and the witness rank, a
+Lamport stamp grown by everything absorbed from anywhere,
+stamped onto inserts so sibling contests are won by
+whoever has seen more, not whoever has typed more. The
+distinction was paid for in the duet trial, where one
+counter doing both jobs produced the foxbrown.
 """
 
 from __future__ import annotations
@@ -35,6 +40,7 @@ class Author:
     clock: VersionVector = field(
         default_factory=VersionVector
     )
+    witness_rank: int = 0
 
     def _mint(self) -> OpId:
         return OpId(
@@ -45,6 +51,16 @@ class Author:
     def _record(self, op: Op) -> None:
         self.weave.apply(op)
         self.clock.observe(op.id)
+
+    def absorb(self, op: Op) -> str:
+        """Weave a remote operation and let the witness rank grow with it."""
+        receipt = self.weave.apply(op)
+        self.clock.observe(op.id)
+        if isinstance(op, Insert):
+            self.witness_rank = max(
+                self.witness_rank, op.rank
+            )
+        return receipt
 
     def type_at(
         self, index: int, text: str
@@ -57,10 +73,12 @@ class Author:
         anchor = self.weave.origin_for_insert_at(index)
         minted: list[Op] = []
         for glyph in text:
+            self.witness_rank += 1
             op = Insert(
                 id=self._mint(),
                 origin=anchor,
                 glyph=glyph,
+                rank=self.witness_rank,
             )
             self._record(op)
             anchor = op.id
