@@ -14,6 +14,7 @@ TRIALS = (
     "loom.trials.undotrial",
     "loom.trials.interleavetrial",
     "loom.trials.marktrial",
+    "loom.trials.longhaul",
 )
 
 
