@@ -134,6 +134,13 @@ class Postmaster:
                     f"{mark.id.wire()} shelved: its "
                     "pins have not arrived"
                 )
+            drained = self._sweep_attire()
+            if drained:
+                receipt += (
+                    f"; {drained} attire item(s) "
+                    "drained, the cork rule holding "
+                    "upstairs too"
+                )
             return receipt
         if verb == "unm":
             if len(parts) != 3:
@@ -152,6 +159,13 @@ class Postmaster:
                 return (
                     f"{unmark.id.wire()} shelved: "
                     "its mark has not arrived"
+                )
+            drained = self._sweep_attire()
+            if drained:
+                receipt += (
+                    f"; {drained} attire item(s) "
+                    "drained, the cork rule holding "
+                    "upstairs too"
                 )
             return receipt
         if verb in ("ttl", "sts"):
