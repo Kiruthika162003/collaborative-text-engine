@@ -1,6 +1,24 @@
 from __future__ import annotations
 
-from examples import pairday, reviewday, trainday
+from examples import (
+    pairday,
+    reviewday,
+    trainday,
+    writingday,
+)
+
+
+class TestWritingDay:
+    def test_the_day_reads_end_to_end(self, capsys):
+        assert writingday.main() == 0
+        out = capsys.readouterr().out
+        assert "Trip Plan" in out
+        assert "  Packing" in out
+        assert "1. tent\n2. stove\n3. maps" in out
+        assert "paragraphs: 4" in out
+        assert "most-used:  'plan' x3" in out
+        assert "links:      1 found" in out
+        assert "words:      25" in out
 
 
 class TestReviewDay:
