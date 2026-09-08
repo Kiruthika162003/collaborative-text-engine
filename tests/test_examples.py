@@ -1,6 +1,28 @@
 from __future__ import annotations
 
-from examples import pairday, trainday
+from examples import pairday, reviewday, trainday
+
+
+class TestReviewDay:
+    def test_the_day_reads_end_to_end(self, capsys):
+        assert reviewday.main() == 0
+        out = capsys.readouterr().out
+        assert (
+            "text:    'the very strong draft is done'"
+        ) in out
+        assert (
+            "the very [+strong+ editor][-good-] "
+            "draft is[- very-] done"
+        ) in out
+        assert "editor added 6 glyph(s)" in out
+        assert (
+            "writer's baseline text lost 9 glyph(s)"
+        ) in out
+        assert (
+            "byline:  writer: 'the very '; editor: "
+            "'strong'; writer: ' draft is done'"
+        ) in out
+        assert "words:   6 surviving" in out
 
 
 class TestTrainDay:
