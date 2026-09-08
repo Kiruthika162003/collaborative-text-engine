@@ -1,11 +1,32 @@
 from __future__ import annotations
 
 from examples import (
+    collabnight,
     pairday,
     reviewday,
     trainday,
     writingday,
 )
+
+
+class TestCollabNight:
+    def test_the_night_reads_end_to_end(self, capsys):
+        assert collabnight.main() == 0
+        out = capsys.readouterr().out
+        assert "session night, 2 ticket(s):" in out
+        assert (
+            "bob seated as a writer; the ticket is "
+            "spent"
+        ) in out
+        assert (
+            "text:    'the rough draft needs work'"
+        ) in out
+        assert "'rough' wears bold" in out
+        assert "bob on 'rough': too harsh?" in out
+        assert (
+            "the rough draft [+needs work+ bob]"
+        ) in out
+        assert "words:   5" in out
 
 
 class TestWritingDay:
