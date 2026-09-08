@@ -3,6 +3,7 @@ from __future__ import annotations
 from examples import (
     collabnight,
     pairday,
+    researchday,
     reviewday,
     trainday,
     writingday,
@@ -80,6 +81,20 @@ class TestTrainDay:
             "alice replay matches: True; bob replay "
             "matches: True"
         ) in out
+
+
+class TestResearchDay:
+    def test_the_day_reads_end_to_end(self, capsys):
+        assert researchday.main() == 0
+        out = capsys.readouterr().out
+        assert "Field Notes" in out
+        assert "[1] Rees, M (2018). Flood Watch." in out
+        assert "sentences: 4" in out
+        assert "ease:      94.2" in out
+        assert "pages:     2 at one line each" in out
+        assert "1 handoff(s) between hands" in out
+        assert "authorship: alice 78%, bob 22%" in out
+        assert "reads as a monologue" in out
 
 
 class TestPairDay:
