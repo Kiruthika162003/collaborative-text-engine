@@ -12,6 +12,7 @@ TRIALS = (
     "loom.trials.deltabill",
     "loom.trials.gravetrial",
     "loom.trials.undotrial",
+    "loom.trials.interleavetrial",
 )
 
 
