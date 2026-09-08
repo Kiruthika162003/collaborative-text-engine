@@ -25,7 +25,7 @@ from loom.weave import HEAD, Insert, Op, Shear
 HEAD_MARK = "^"
 
 
-def _escape(glyph: str) -> str:
+def escape_glyph(glyph: str) -> str:
     return (
         glyph.replace("\\", "\\\\")
         .replace("|", "\\p")
@@ -33,7 +33,7 @@ def _escape(glyph: str) -> str:
     )
 
 
-def _unescape(text: str) -> str:
+def unescape_glyph(text: str) -> str:
     out = []
     index = 0
     while index < len(text):
@@ -72,7 +72,7 @@ def encode(op: Op) -> str:
         )
         return (
             f"ins|{op.id.wire()}|{origin}|{op.rank}|"
-            f"{_escape(op.glyph)}"
+            f"{escape_glyph(op.glyph)}"
         )
     return f"shr|{op.id.wire()}|{op.target.wire()}"
 
@@ -105,7 +105,7 @@ def decode(line: str) -> Op:
         return Insert(
             id=OpId.parse(id_text),
             origin=origin,
-            glyph=_unescape(glyph),
+            glyph=unescape_glyph(glyph),
             rank=rank,
         )
     if verb == "shr":
