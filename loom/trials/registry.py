@@ -8,6 +8,7 @@ from loom.trials.verdict import Verdict
 
 TRIALS = (
     "loom.trials.duet",
+    "loom.trials.stormtrial",
 )
 
 
