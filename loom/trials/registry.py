@@ -11,6 +11,7 @@ TRIALS = (
     "loom.trials.stormtrial",
     "loom.trials.deltabill",
     "loom.trials.gravetrial",
+    "loom.trials.undotrial",
 )
 
 
