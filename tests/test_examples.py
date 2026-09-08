@@ -1,6 +1,24 @@
 from __future__ import annotations
 
-from examples import pairday
+from examples import pairday, trainday
+
+
+class TestTrainDay:
+    def test_the_day_reads_end_to_end(self, capsys):
+        assert trainday.main() == 0
+        out = capsys.readouterr().out
+        assert (
+            "text:    'DECISIONotes: do not ship it'"
+        ) in out
+        assert "fabric:  one digest" in out
+        assert (
+            "[+DECISION+ bob][-meeting n-]otes: "
+            "[+do not + alice]ship it"
+        ) in out
+        assert (
+            "alice replay matches: True; bob replay "
+            "matches: True"
+        ) in out
 
 
 class TestPairDay:
