@@ -16,6 +16,7 @@ TRIALS = (
     "loom.trials.marktrial",
     "loom.trials.longhaul",
     "loom.trials.sessiontrial",
+    "loom.trials.mergetrial",
 )
 
 
