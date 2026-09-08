@@ -41,6 +41,7 @@ class Author:
         default_factory=VersionVector
     )
     witness_rank: int = 0
+    tape: object | None = None
 
     def _mint(self) -> OpId:
         return OpId(
@@ -51,6 +52,8 @@ class Author:
     def _record(self, op: Op) -> None:
         self.weave.apply(op)
         self.clock.observe(op.id)
+        if self.tape is not None:
+            self.tape.record(op)
 
     def absorb(self, op: Op) -> str:
         """Weave a remote operation and let the witness rank grow with it."""
@@ -60,6 +63,8 @@ class Author:
             self.witness_rank = max(
                 self.witness_rank, op.rank
             )
+        if self.tape is not None:
+            self.tape.record(op)
         return receipt
 
     def type_at(
