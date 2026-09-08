@@ -64,11 +64,33 @@ def _run_trial(name: str) -> int:
     return 0 if verdict.holds else 1
 
 
+def _run_rooms() -> int:
+    from loom.rooms import directory
+
+    print(directory())
+    return 0
+
+
+def _run_days() -> int:
+    from loom.rooms import itinerary
+
+    print(itinerary())
+    return 0
+
+
 def main(argv: list[str] | None = None) -> int:
     parser = argparse.ArgumentParser(prog="loom")
     commands = parser.add_subparsers(dest="command")
     commands.add_parser(
         "summary", help="one line: N trials (M broken)"
+    )
+    commands.add_parser(
+        "rooms",
+        help="every module and its first sentence",
+    )
+    commands.add_parser(
+        "days",
+        help="every example and its first sentence",
     )
     commands.add_parser(
         "check",
@@ -90,6 +112,10 @@ def main(argv: list[str] | None = None) -> int:
         return _run_docket()
     if arguments.command == "trial":
         return _run_trial(arguments.name)
+    if arguments.command == "rooms":
+        return _run_rooms()
+    if arguments.command == "days":
+        return _run_days()
     parser.print_help()
     return 2
 
