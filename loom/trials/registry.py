@@ -18,6 +18,7 @@ TRIALS = (
     "loom.trials.sessiontrial",
     "loom.trials.mergetrial",
     "loom.trials.anchortrial",
+    "loom.trials.citetrial",
 )
 
 
