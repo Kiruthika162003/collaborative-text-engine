@@ -72,7 +72,7 @@ def merge3(base: str, ours: str, theirs: str) -> tuple[str, bool]:
         theirs_seg = theirs_lines[prev_t + 1 : theirs_j]
         if ours_seg == base_seg:
             result.extend(theirs_seg)
-        elif theirs_seg == base_seg or ours_seg == theirs_seg:
+        elif theirs_seg in (base_seg, ours_seg):
             result.extend(ours_seg)
         else:
             conflict = True
