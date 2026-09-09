@@ -23,6 +23,7 @@ TRIALS = (
     "loom.trials.hotspottrial",
     "loom.trials.patchtrial",
     "loom.trials.tidytrial",
+    "loom.trials.echotrial",
 )
 
 
