@@ -3,6 +3,7 @@ from __future__ import annotations
 from examples import (
     analyticsday,
     collabnight,
+    formatday,
     pairday,
     researchday,
     reviewday,
@@ -82,6 +83,17 @@ class TestTrainDay:
             "alice replay matches: True; bob replay "
             "matches: True"
         ) in out
+
+
+class TestFormatDay:
+    def test_the_day_reads_end_to_end(self, capsys):
+        assert formatday.main() == 0
+        out = capsys.readouterr().out
+        after = out.split("after:")[1]
+        assert "- first\n- second" in after
+        assert "1. a\n2. b" in after
+        assert "| x   | y   |" in after
+        assert "# Title\n" in after
 
 
 class TestAnalyticsDay:
