@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 from examples import (
+    analyticsday,
     collabnight,
     pairday,
     researchday,
@@ -81,6 +82,17 @@ class TestTrainDay:
             "alice replay matches: True; bob replay "
             "matches: True"
         ) in out
+
+
+class TestAnalyticsDay:
+    def test_the_day_reads_end_to_end(self, capsys):
+        assert analyticsday.main() == 0
+        out = capsys.readouterr().out
+        assert "agree:   True" in out
+        assert "1 hotspot(s) where hands met:" in out
+        assert "siblings from alice, bob" in out
+        assert "concurrency, not trouble" in out
+        assert "keywords: plan, favours, alice" in out
 
 
 class TestResearchDay:
