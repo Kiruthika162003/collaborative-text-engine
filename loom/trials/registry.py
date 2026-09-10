@@ -24,6 +24,7 @@ TRIALS = (
     "loom.trials.patchtrial",
     "loom.trials.tidytrial",
     "loom.trials.echotrial",
+    "loom.trials.relaytrial",
 )
 
 
